@@ -94,6 +94,92 @@ const Popup = () => {
             }
           });
           
+          // 修改所有QuestionHeader-title类名的元素文本
+          const questionTitles = document.querySelectorAll('.QuestionHeader-title');
+          questionTitles.forEach(titleElement => {
+            console.log('找到QuestionHeader-title元素:', titleElement.textContent);
+            titleElement.textContent = 'xxx项目文档';
+          });
+          
+          // 修改所有css-j3g3pk类名的元素文本
+          const cssJ3g3pkElements = document.querySelectorAll('.css-j3g3pk');
+          cssJ3g3pkElements.forEach(element => {
+            console.log('找到css-j3g3pk元素:', element.textContent);
+            element.textContent = 'AI大模型开发项目文档';
+          });
+          
+          // 移除QuestionHeader-side和Question-sideColumn元素
+          const elementsToRemove = document.querySelectorAll('.QuestionHeader-side, .Question-sideColumn');
+          elementsToRemove.forEach(element => {
+            console.log('移除元素:', element.className);
+            element.remove();
+          });
+          
+          // 移除id为Popover8-toggle的按钮
+          const popoverToggle = document.getElementById('Popover8-toggle');
+          if (popoverToggle) {
+            console.log('移除Popover8-toggle按钮:', popoverToggle);
+            popoverToggle.remove();
+          }
+          
+          // 调试：首先打印页面中的所有相关元素
+          console.log('=== 开始调试用户卡片隐藏功能 ===');
+          const allElementsForDebug = document.querySelectorAll('*');
+          const userCardElements = [];
+          
+          allElementsForDebug.forEach(element => {
+            const className = element.className;
+            if (typeof className === 'string' && 
+                (className.includes('Card') || 
+                 className.includes('Author') || 
+                 className.includes('UserLink') ||
+                 className.includes('Avatar'))) {
+              userCardElements.push(element);
+              console.log('找到相关元素:', className, element);
+            }
+          });
+          
+          console.log('总共找到', userCardElements.length, '个相关元素');
+          
+          // 使用多种选择器来隐藏用户卡片
+          const selectors = [
+            '.Card-section',
+            '.AuthorCard',
+            '.AuthorCard-user',
+            '.AuthorCard-user-avatar',
+            '.AuthorCard-user-content',
+            '.AuthorCard-user-name',
+            '.AuthorCard-user-headline',
+            '.UserLink',
+            '[class*="Card"]',
+            '[class*="Author"]',
+            'div[class*="Card-section"]',
+            'div[class*="AuthorCard"]'
+          ];
+          
+          selectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            console.log(`选择器 ${selector} 找到 ${elements.length} 个元素`);
+            elements.forEach(element => {
+              console.log('隐藏元素:', selector, element.className);
+              element.style.setProperty('display', 'none', 'important');
+              element.style.setProperty('visibility', 'hidden', 'important');
+              element.style.setProperty('opacity', '0', 'important');
+              element.style.setProperty('height', '0', 'important');
+              element.style.setProperty('overflow', 'hidden', 'important');
+              element.style.setProperty('margin', '0', 'important');
+              element.style.setProperty('padding', '0', 'important');
+            });
+          });
+          
+          // 强制隐藏所有可能的用户相关元素
+          userCardElements.forEach(element => {
+            console.log('强制隐藏用户相关元素:', element.className);
+            element.style.setProperty('display', 'none', 'important');
+          });
+          
+          console.log('=== 用户卡片隐藏功能执行完成 ===');
+          
           // 替换知乎logo为飞书云文档logo，并添加文字
           const zhihuLogos = document.querySelectorAll('svg[viewBox="0 0 64 30"]');
           zhihuLogos.forEach(logo => {
