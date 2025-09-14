@@ -28,3 +28,28 @@ code {
   border-radius: 0.25rem;
   padding: 0.2rem 0.5rem;
 }
+
+/* 防止按钮点击时出现绿色等不必要的颜色变化 */
+.App button {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.App button:focus {
+  outline: none !important;
+}
+
+.App button:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* 移除移动端点击高亮 */
+.App * {
+  -webkit-tap-highlight-color: transparent !important;
+}
