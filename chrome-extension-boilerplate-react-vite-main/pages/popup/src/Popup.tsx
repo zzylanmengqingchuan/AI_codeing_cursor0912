@@ -266,40 +266,108 @@ const Popup = () => {
               contentLines.push(titleText, '');
             }
             
-            // 获取问题描述
-            const questionDetail = document.querySelector('.QuestionRichText, .Post-RichText, .ArticleItem-content');
+            // 获取问题描述或文章描述
+            let questionDetailText = '';
+            const questionDetail = document.querySelector('.QuestionRichText');
             if (questionDetail) {
-              const detailText = questionDetail.textContent?.trim();
-              if (detailText) {
-                content += `问题描述：\n${detailText}\n\n`;
-                contentLines.push('问题描述：', detailText, '');
+              questionDetailText = questionDetail.textContent?.trim() || '';
+              if (questionDetailText) {
+                content += `问题描述：\n${questionDetailText}\n\n`;
+                contentLines.push('问题描述：', questionDetailText, '');
               }
             }
             
-            // 获取所有回答内容
-            const answers = document.querySelectorAll('.RichContent-inner, .AnswerItem .RichContent, .Post .RichContent');
+            // 获取所有回答内容 - 优化去重逻辑
+            const answers = document.querySelectorAll('.List-item .AnswerItem, .AnswerItem');
+            const processedAnswers = new Set(); // 用于去重
+            
             if (answers.length > 0) {
               content += '回答内容：\n';
               contentLines.push('回答内容：');
-              answers.forEach((answer, index) => {
-                const answerText = answer.textContent?.trim();
-                if (answerText && answerText.length > 50) {
-                  const answerHeader = `--- 回答 ${index + 1} ---`;
+              
+              let validAnswerCount = 0;
+              answers.forEach((answerItem, index) => {
+                // 尝试多种选择器获取回答内容
+                const contentSelectors = [
+                  '.RichContent-inner',
+                  '.RichText',
+                  '.AnswerItem-content .RichContent',
+                  '.ContentItem-content'
+                ];
+                
+                let answerText = '';
+                for (const selector of contentSelectors) {
+                  const contentElement = answerItem.querySelector(selector);
+                  if (contentElement) {
+                    answerText = contentElement.textContent?.trim() || '';
+                    break;
+                  }
+                }
+                
+                // 如果没找到内容，尝试直接获取
+                if (!answerText) {
+                  answerText = answerItem.textContent?.trim() || '';
+                }
+                
+                // 去重和过滤逻辑
+                if (answerText && 
+                    answerText.length > 100 && 
+                    !processedAnswers.has(answerText) &&
+                    !answerText.includes('展开阅读全文') &&
+                    !answerText.includes('显示全部')) {
+                  
+                  processedAnswers.add(answerText);
+                  validAnswerCount++;
+                  
+                  const answerHeader = `--- 回答 ${validAnswerCount} ---`;
                   content += `\n${answerHeader}\n${answerText}\n`;
                   contentLines.push('', answerHeader, answerText);
                 }
               });
+              
+              console.log(`处理了 ${answers.length} 个回答项，有效回答 ${validAnswerCount} 个`);
             }
             
-            // 如果没有找到回答，尝试获取文章内容
+            // 如果没有找到回答，尝试获取文章内容（避免与问题描述重复）
             if (answers.length === 0) {
-              const articleContent = document.querySelector('.Post-RichTextContainer, .ArticleItem-content, .RichText');
-              if (articleContent) {
-                const articleText = articleContent.textContent?.trim();
-                if (articleText) {
-                  content += '文章内容：\n' + articleText + '\n';
-                  contentLines.push('文章内容：', articleText);
+              // 尝试多个选择器获取文章内容
+              const articleSelectors = [
+                '.Post-RichTextContainer .RichText',
+                '.ArticleItem-content .RichText', 
+                '.Post-content .RichText',
+                '.RichText.ztext'
+              ];
+              
+              let articleText = '';
+              for (const selector of articleSelectors) {
+                const articleElement = document.querySelector(selector);
+                if (articleElement) {
+                  const tempText = articleElement.textContent?.trim() || '';
+                  // 确保文章内容与问题描述不重复
+                  if (tempText && tempText !== questionDetailText && tempText.length > 100) {
+                    articleText = tempText;
+                    break;
+                  }
                 }
+              }
+              
+              // 如果还是没找到，或者找到的内容太短/重复，则尝试更通用的选择器
+              if (!articleText) {
+                const fallbackElement = document.querySelector('.Post-RichTextContainer, .ArticleItem-content');
+                if (fallbackElement) {
+                  const tempText = fallbackElement.textContent?.trim() || '';
+                  if (tempText && tempText !== questionDetailText && tempText.length > 100) {
+                    articleText = tempText;
+                  }
+                }
+              }
+              
+              if (articleText) {
+                content += '文章内容：\n' + articleText + '\n';
+                contentLines.push('文章内容：', articleText);
+                console.log('找到文章内容，长度:', articleText.length);
+              } else {
+                console.log('未找到有效的文章内容或内容与描述重复');
               }
             }
             
