@@ -122,6 +122,26 @@ const Popup = () => {
             popoverToggle.remove();
           }
           
+          // 隐藏Post-Row-Content-left-article类名元素中的所有视频和图片
+          const articleElements = document.querySelectorAll('.Post-Row-Content-left-article');
+          articleElements.forEach(article => {
+            // 隐藏图片
+            const images = article.querySelectorAll('img, picture, [class*="image"], [class*="Image"]');
+            images.forEach(img => {
+              console.log('隐藏图片:', img);
+              (img as HTMLElement).style.setProperty('display', 'none', 'important');
+            });
+            
+            // 隐藏视频
+            const videos = article.querySelectorAll('video, iframe, [class*="video"], [class*="Video"], [class*="player"], [class*="Player"]');
+            videos.forEach(video => {
+              console.log('隐藏视频:', video);
+              (video as HTMLElement).style.setProperty('display', 'none', 'important');
+            });
+            
+            console.log(`在文章中隐藏了 ${images.length} 个图片和 ${videos.length} 个视频`);
+          });
+          
           // 调试：首先打印页面中的所有相关元素
           console.log('=== 开始调试用户卡片隐藏功能 ===');
           const allElementsForDebug = document.querySelectorAll('*');
@@ -162,20 +182,20 @@ const Popup = () => {
             console.log(`选择器 ${selector} 找到 ${elements.length} 个元素`);
             elements.forEach(element => {
               console.log('隐藏元素:', selector, element.className);
-              element.style.setProperty('display', 'none', 'important');
-              element.style.setProperty('visibility', 'hidden', 'important');
-              element.style.setProperty('opacity', '0', 'important');
-              element.style.setProperty('height', '0', 'important');
-              element.style.setProperty('overflow', 'hidden', 'important');
-              element.style.setProperty('margin', '0', 'important');
-              element.style.setProperty('padding', '0', 'important');
+              (element as HTMLElement).style.setProperty('display', 'none', 'important');
+              (element as HTMLElement).style.setProperty('visibility', 'hidden', 'important');
+              (element as HTMLElement).style.setProperty('opacity', '0', 'important');
+              (element as HTMLElement).style.setProperty('height', '0', 'important');
+              (element as HTMLElement).style.setProperty('overflow', 'hidden', 'important');
+              (element as HTMLElement).style.setProperty('margin', '0', 'important');
+              (element as HTMLElement).style.setProperty('padding', '0', 'important');
             });
           });
           
           // 强制隐藏所有可能的用户相关元素
           userCardElements.forEach(element => {
             console.log('强制隐藏用户相关元素:', element.className);
-            element.style.setProperty('display', 'none', 'important');
+            (element as HTMLElement).style.setProperty('display', 'none', 'important');
           });
           
           console.log('=== 用户卡片隐藏功能执行完成 ===');
