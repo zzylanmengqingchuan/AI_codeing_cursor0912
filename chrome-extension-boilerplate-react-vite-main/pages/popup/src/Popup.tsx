@@ -37,6 +37,136 @@ const Popup = () => {
       });
   };
 
+  const addCopyButton = async () => {
+    const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+
+    if (tab.url!.startsWith('about:') || tab.url!.startsWith('chrome:')) {
+      return;
+    }
+
+    // 检查是否是知乎页面
+    if (!tab.url!.includes('zhihu.com')) {
+      return;
+    }
+
+    await chrome.scripting
+      .executeScript({
+        target: { tabId: tab.id! },
+        func: () => {
+          // 避免重复添加按钮
+          if (document.getElementById('zhihu-copy-button')) {
+            return;
+          }
+
+          // 创建复制按钮
+          const copyButton = document.createElement('button');
+          copyButton.id = 'zhihu-copy-button';
+          copyButton.textContent = '复制内容';
+          copyButton.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          `;
+
+          // 添加悬停效果
+          copyButton.onmouseenter = () => {
+            copyButton.style.transform = 'translateY(-2px)';
+            copyButton.style.boxShadow = '0 6px 25px rgba(0,0,0,0.4)';
+          };
+          copyButton.onmouseleave = () => {
+            copyButton.style.transform = 'translateY(0)';
+            copyButton.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+          };
+
+          // 复制功能
+          copyButton.onclick = () => {
+            let content = '';
+            
+            // 获取问题标题
+            const questionTitle = document.querySelector('.QuestionHeader-title, .Post-Title, .ArticleItem-title');
+            if (questionTitle) {
+              content += `标题：${questionTitle.textContent?.trim()}\n\n`;
+            }
+            
+            // 获取问题描述
+            const questionDetail = document.querySelector('.QuestionRichText, .Post-RichText, .ArticleItem-content');
+            if (questionDetail) {
+              content += `问题描述：\n${questionDetail.textContent?.trim()}\n\n`;
+            }
+            
+            // 获取所有回答内容
+            const answers = document.querySelectorAll('.RichContent-inner, .AnswerItem .RichContent, .Post .RichContent');
+            if (answers.length > 0) {
+              content += '回答内容：\n';
+              answers.forEach((answer, index) => {
+                const answerText = answer.textContent?.trim();
+                if (answerText && answerText.length > 50) {
+                  content += `\n--- 回答 ${index + 1} ---\n`;
+                  content += answerText + '\n';
+                }
+              });
+            }
+            
+            // 如果没有找到回答，尝试获取文章内容
+            if (answers.length === 0) {
+              const articleContent = document.querySelector('.Post-RichTextContainer, .ArticleItem-content, .RichText');
+              if (articleContent) {
+                content += '文章内容：\n';
+                content += articleContent.textContent?.trim() + '\n';
+              }
+            }
+            
+            // 复制到剪贴板
+            if (content.trim()) {
+              navigator.clipboard.writeText(content).then(() => {
+                // 按钮临时变色提示成功
+                const originalText = copyButton.textContent;
+                const originalBg = copyButton.style.background;
+                
+                copyButton.textContent = '✓ 已复制';
+                copyButton.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                  copyButton.textContent = originalText;
+                  copyButton.style.background = originalBg;
+                }, 2000);
+              }).catch(() => {
+                // 复制失败时的提示
+                const originalText = copyButton.textContent;
+                const originalBg = copyButton.style.background;
+                
+                copyButton.textContent = '✗ 复制失败';
+                copyButton.style.background = '#f44336';
+                
+                setTimeout(() => {
+                  copyButton.textContent = originalText;
+                  copyButton.style.background = originalBg;
+                }, 2000);
+              });
+            }
+          };
+
+          // 添加按钮到页面
+          document.body.appendChild(copyButton);
+        },
+      })
+      .catch(err => {
+        console.error('添加复制按钮错误:', err);
+      });
+  };
+
   const modifyZhihuStyle = async () => {
     const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
 
@@ -274,6 +404,14 @@ const Popup = () => {
           )}
           onClick={modifyZhihuStyle}>
           修改知乎样式
+        </button>
+        <button
+          className={cn(
+            'mt-2 rounded px-4 py-1 font-bold shadow hover:scale-105',
+            isLight ? 'bg-green-200 text-black' : 'bg-green-700 text-white',
+          )}
+          onClick={addCopyButton}>
+          添加复制按钮
         </button>
         <ToggleButton>{t('toggleTheme')}</ToggleButton>
       </header>
