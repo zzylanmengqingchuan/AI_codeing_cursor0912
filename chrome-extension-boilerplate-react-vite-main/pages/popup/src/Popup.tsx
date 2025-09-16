@@ -690,40 +690,90 @@ const Popup = () => {
   };
 
   return (
-    <div className={cn('App', isLight ? 'bg-slate-50' : 'bg-gray-800')}>
-      <header className={cn('App-header', isLight ? 'text-gray-900' : 'text-gray-100')}>
-        <button onClick={goGithubSite}>
-          <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
-        </button>
-        <p>
-          Edit <code>pages/popup/src/Popup.tsx</code>
-        </p>
-        <button
-          className={cn(
-            'mt-4 rounded px-4 py-1 font-bold shadow hover:scale-105',
-            isLight ? 'bg-blue-200 text-black' : 'bg-gray-700 text-white',
-          )}
-          onClick={injectContentScript}>
-          {t('injectButton')}
-        </button>
-        <button
-          className={cn(
-            'mt-2 rounded px-4 py-1 font-bold shadow hover:scale-105',
-            isLight ? 'bg-pink-200 text-black' : 'bg-pink-700 text-white',
-          )}
-          onClick={modifyZhihuStyle}>
-          修改知乎样式
-        </button>
-        <button
-          className={cn(
-            'mt-2 rounded px-4 py-1 font-bold shadow hover:scale-105',
-            isLight ? 'bg-green-200 text-black' : 'bg-green-700 text-white',
-          )}
-          onClick={addCopyButton}>
-          添加复制按钮
-        </button>
-        <ToggleButton>{t('toggleTheme')}</ToggleButton>
-      </header>
+    <div className={cn('App', isLight ? 'bg-gradient-to-br from-blue-50 to-indigo-100' : 'bg-gradient-to-br from-gray-900 to-gray-800')}>
+      <div className="h-[550px] w-[380px] p-4 flex flex-col">
+        {/* 头部区域 */}
+        <div className="text-center mb-4">
+          <div className="flex items-center justify-center mb-2">
+            <div className="text-3xl mr-2">🐻</div>
+            <div>
+              <h1 className={cn('text-lg font-bold', isLight ? 'text-gray-800' : 'text-white')}>
+                小熊爱摸鱼
+              </h1>
+              <p className={cn('text-xs', isLight ? 'text-gray-600' : 'text-gray-300')}>
+                知乎换装助手
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 功能按钮区域 */}
+        <div className="space-y-3 mb-4">
+          <button
+            className={cn(
+              'w-full py-3 px-4 rounded-lg font-medium shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
+              isLight 
+                ? 'bg-gradient-to-r from-pink-400 to-red-400 text-white hover:from-pink-500 hover:to-red-500' 
+                : 'bg-gradient-to-r from-pink-500 to-red-500 text-white hover:from-pink-600 hover:to-red-600'
+            )}
+            onClick={modifyZhihuStyle}>
+            <div className="flex items-center justify-center">
+              <span className="mr-2">🎭</span>
+              修改知乎样式
+            </div>
+          </button>
+          
+          <button
+            className={cn(
+              'w-full py-3 px-4 rounded-lg font-medium shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
+              isLight 
+                ? 'bg-gradient-to-r from-green-400 to-blue-400 text-white hover:from-green-500 hover:to-blue-500' 
+                : 'bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600'
+            )}
+            onClick={addCopyButton}>
+            <div className="flex items-center justify-center">
+              <span className="mr-2">📋</span>
+              添加复制按钮
+            </div>
+          </button>
+        </div>
+
+        {/* 分割线 */}
+        <div className={cn('border-t my-3', isLight ? 'border-gray-200' : 'border-gray-600')}></div>
+
+        {/* 公众号信息区域 */}
+        <div className={cn('rounded-lg p-4 mb-4 border', isLight ? 'bg-white border-gray-200 shadow-sm' : 'bg-gray-800 border-gray-600')}>
+          <div className="text-center">
+            <div className="text-2xl mb-3">📱</div>
+            <h3 className={cn('font-bold text-base mb-2', isLight ? 'text-gray-800' : 'text-white')}>
+              关注公众号获取更多
+            </h3>
+            <div className={cn('text-xl font-bold mb-3 px-3 py-1 rounded-full inline-block', 
+              isLight ? 'text-blue-600 bg-blue-50' : 'text-blue-400 bg-blue-900/30')}>
+              阑梦清川
+            </div>
+            <div className={cn('text-sm space-y-1', isLight ? 'text-gray-600' : 'text-gray-300')}>
+              <div className="flex items-center justify-start">
+                <span className="text-green-500 mr-2">•</span>
+                插件使用问题反馈
+              </div>
+              <div className="flex items-center justify-start">
+                <span className="text-blue-500 mr-2">•</span>
+                AI编程技术分享
+              </div>
+              <div className="flex items-center justify-start">
+                <span className="text-purple-500 mr-2">•</span>
+                更多摸鱼工具推荐
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 底部主题切换 */}
+        <div className="flex justify-center mt-auto">
+          <ToggleButton>{t('toggleTheme')}</ToggleButton>
+        </div>
+      </div>
     </div>
   );
 };
